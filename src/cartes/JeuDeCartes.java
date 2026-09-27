@@ -26,4 +26,53 @@ public class JeuDeCartes {
         new Configuration(new Botte(Type.CREVAISON), 1),
         new Configuration(new Botte(Type.ACCIDENT), 1)
     };
+
+    public String affichageJeuCartes() {
+        String resultat = "";
+
+        for (Configuration config : typesDeCartes) {
+            resultat += config.getNbExemplaires()
+                    + " "
+                    + config.getCarte()
+                    + "\n";
+        }
+
+        return resultat;
+    }
+
+    // Nom indiqué dans le sujet
+    public String affichageJeuDeCartes() {
+        return affichageJeuCartes();
+    }
+
+    public Carte[] donnerCartes() {
+        int total = 0;
+
+        for (Configuration config : typesDeCartes) {
+            total += config.getNbExemplaires();
+        }
+
+        Carte[] cartes = new Carte[total];
+        int indice = 0;
+
+        for (Configuration config : typesDeCartes) {
+
+            for (int i = 0; i < config.getNbExemplaires(); i++) {
+                cartes[indice] = config.getCarte();
+                indice++;
+            }
+        }
+
+        return cartes;
+    }
+
+    public boolean checkCount() {
+        int total = 0;
+
+        for (Configuration config : typesDeCartes) {
+            total += config.getNbExemplaires();
+        }
+
+        return total == 106;
+    }
 }
