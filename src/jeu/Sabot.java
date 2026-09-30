@@ -10,12 +10,11 @@ public class Sabot implements Iterable<Carte> {
 
     private Carte[] cartes;
     private int nbCartes;
-    private int modCount;
+    private int nombreOperations = 0;
 
     public Sabot(Carte[] cartes) {
         this.cartes = cartes;
         this.nbCartes = cartes.length;
-        this.modCount = 0;
     }
 
     public boolean estVide() {
@@ -29,74 +28,74 @@ public class Sabot implements Iterable<Carte> {
 
         cartes[nbCartes] = carte;
         nbCartes++;
-        modCount++;
+        nombreOperations++;
     }
 
     @Override
     public Iterator<Carte> iterator() {
+        return new Iterateur();
+    }
 
-        return new Iterator<Carte>() {
+    private class Iterateur implements Iterator<Carte> {
 
-            private int indice = 0;
-            private int dernierRetourne = -1;
-            private int expectedModCount = modCount;
+        private int indiceIterateur = 0;
+        private boolean nextEffectue = false;
+        private int nombreOperationsReference = nombreOperations;
 
-            @Override
-            public boolean hasNext() {
-                verifierModification();
-                return indice < nbCartes;
+        @Override
+        public boolean hasNext() {
+            return indiceIterateur < nbCartes;
+        }
+
+        @Override
+        public Carte next() {
+            verificationConcurrence();
+
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
 
-            @Override
-            public Carte next() {
-                verifierModification();
+            Carte carte = cartes[indiceIterateur];
+            indiceIterateur++;
+            nextEffectue = true;
 
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
+            return carte;
+        }
 
-                Carte carte = cartes[indice];
-                dernierRetourne = indice;
-                indice++;
+        @Override
+        public void remove() {
+            verificationConcurrence();
 
-                return carte;
+            if (nbCartes < 1 || !nextEffectue) {
+                throw new IllegalStateException();
             }
 
-            @Override
-            public void remove() {
-                verifierModification();
-
-                if (dernierRetourne == -1) {
-                    throw new IllegalStateException();
-                }
-
-                for (int i = dernierRetourne; i < nbCartes - 1; i++) {
-                    cartes[i] = cartes[i + 1];
-                }
-
-                cartes[nbCartes - 1] = null;
-                nbCartes--;
-                indice--;
-
-                dernierRetourne = -1;
-
-                modCount++;
-                expectedModCount++;
+            for (int i = indiceIterateur - 1; i < nbCartes - 1; i++) {
+                cartes[i] = cartes[i + 1];
             }
 
-            private void verifierModification() {
-                if (modCount != expectedModCount) {
-                    throw new ConcurrentModificationException();
-                }
+            cartes[nbCartes - 1] = null;
+
+            nextEffectue = false;
+            indiceIterateur--;
+            nbCartes--;
+
+            nombreOperations++;
+            nombreOperationsReference++;
+        }
+
+        private void verificationConcurrence() {
+            if (nombreOperations != nombreOperationsReference) {
+                throw new ConcurrentModificationException();
             }
-        };
+        }
     }
 
     public Carte piocher() {
-        Iterator<Carte> it = iterator();
+        Iterator<Carte> iterateur = iterator();
 
-        Carte carte = it.next();
-        it.remove();
+        Carte carte = iterateur.next();
+        iterateur.remove();
 
         return carte;
     }

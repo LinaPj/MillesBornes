@@ -28,19 +28,18 @@ public class JeuDeCartes {
     };
 
     public String affichageJeuCartes() {
-        String resultat = "";
+        StringBuilder resultat = new StringBuilder();
 
         for (Configuration config : typesDeCartes) {
-            resultat += config.getNbExemplaires()
-                    + " "
-                    + config.getCarte()
-                    + "\n";
+            resultat.append(config.getNbExemplaires())
+                    .append(" ")
+                    .append(config.getCarte())
+                    .append("\n");
         }
 
-        return resultat;
+        return resultat.toString();
     }
-
-    // Nom indiqué dans le sujet
+    
     public String affichageJeuDeCartes() {
         return affichageJeuCartes();
     }
@@ -67,12 +66,24 @@ public class JeuDeCartes {
     }
 
     public boolean checkCount() {
-        int total = 0;
+
+        Carte[] cartes = donnerCartes();
 
         for (Configuration config : typesDeCartes) {
-            total += config.getNbExemplaires();
+
+            int compteur = 0;
+
+            for (Carte carte : cartes) {
+                if (config.getCarte().equals(carte)) {
+                    compteur++;
+                }
+            }
+
+            if (compteur != config.getNbExemplaires()) {
+                return false;
+            }
         }
 
-        return total == 106;
+        return true;
     }
 }

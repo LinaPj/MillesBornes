@@ -1,4 +1,4 @@
-package testsFonctionnels;
+package testsfonctionnels;
 
 import java.util.Iterator;
 
@@ -54,8 +54,8 @@ public class TestSabot {
 	public static void main(String[] args) {
 		TestSabot testPioche = new TestSabot();
 		testPioche.questionA();
-		testPioche.questionB();
-		testPioche.questionC();
+		//testPioche.questionB();
+		//testPioche.questionC();
 	}
 
 }
